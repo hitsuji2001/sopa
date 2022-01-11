@@ -74,6 +74,12 @@ long from_string_to_long(const char *string) {
     return number;
 }
 
+int exceeded_time(int *time) {
+    int res = *time / 60;
+    *time %= 60;
+    return res;
+}
+
 bool string_contains(const char *string, const char keyword) {
     for(size_t i = 0; i < strlen(string); ++i) {
         if(string[i] == keyword) return true;
@@ -82,7 +88,7 @@ bool string_contains(const char *string, const char keyword) {
     return false;
 }
 
-int from_string_to_clock(Clock *clock, const char *string) {
+int from_clock_format_to_clock(Clock *clock, const char *string) {
     if(!string_contains(string, ':') || string_contains(string, '-')) {
         clock = NULL;
         return -1;
@@ -109,8 +115,22 @@ int from_string_to_clock(Clock *clock, const char *string) {
 
     for(int i = 0; index < strlen(string); ++index) c_seconds[i++] = string[index];
     clock->second = from_string_to_long(c_seconds);
+
+    clock->minute += exceeded_time(&clock->second);
+    clock->hour += exceeded_time(&clock->minute);
     
     return 0;
+}
+
+int from_human_readable_format_to_clock(Clock *clock, const char *string) {
+    if(!string_contains(string, 'h') || !string_contains(string, 'm') || !string_contains(string, 's')) {
+        clock = NULL;
+        return -1;
+    }
+}
+
+int from_string_to_clock(Clock *clock, const char *string) {
+    return from_clock_format_to_clock(clock, string) || from_human_readable_format_to_clock(clock, string);
 }
 
 //TODOO: expected format ./sopa [flags] [time]
@@ -119,9 +139,9 @@ int from_string_to_clock(Clock *clock, const char *string) {
 //TODOOO: set up arguments
 // %lld           : start the clock from %lld seconds - DONE
 // %02d:%02d:%02d : start the clock from %02d:%02d:%02d - WORKING
-// %ds            : start the clock from %d seconds
-// %dm            : start the clock from %d minutes
 // %dh            : start the clock from %d hours
+// %dm            : start the clock from %d minutes
+// %ds            : start the clock from %d seconds
 // %dh%m%s        : start the clock from %d hours %d minutes %d seconds
 // --NOTE: these 3 can be combined
 
@@ -136,7 +156,7 @@ int main(int argc, char **argv) {
         //char *number = argv[1];
         Clock clock;
         //clock = parse_clock_from_long(from_string_to_long(number));
-        if(from_string_to_clock(&clock, argv[1]) < 0) {
+        if(from_clock_format_to_clock(&clock, argv[1]) < 0) {
             printf("Failed to convert from string to Clock\n");
         } else print_clock(&clock);
     }
