@@ -4,7 +4,7 @@
 ## Dependencies
 [SDL2](https://www.libsdl.org/)
 
-###Quick Start
+### Quick Start
 ```bash
 $ ./build.sh
 $ ./sopa `flags` `time`
