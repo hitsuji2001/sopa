@@ -1,7 +1,7 @@
-#Sopa
+# Sopa
 **A Stopwatch reimplement in C**
 
-##Dependencies
+## Dependencies
 [SDL2](https://www.libsdl.org/)
 
 ###Quick Start
