@@ -189,6 +189,36 @@ int from_string_to_clock(Clock *clock, const char *string) {
     else return from_human_readable_format_to_clock(clock, string);
 }
 
+int parse_flags(char *string) {
+    if(!string_contains(string, '-')) return -1;
+
+    if(strlen(string) == 2) {
+        if(string[1] == 'h') {
+            printf("help\n");
+        }
+    } else {
+        if(strcmp(string, "-help") == 0) {
+            printf("help message\n");
+        }
+        else {
+            for(size_t i = 1; i < strlen(string); ++i) {
+                switch (string[i]) {
+                    case 'r':
+                        printf("reverse\n");
+                        break;
+                    case 'p':
+                        printf("pause\n");
+                        break;
+                    default:
+                        return -1;
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
 //TODOO: expected format ./sopa [flags] [time]
 //                              argv[1] argv[2 -> n]
 
@@ -203,19 +233,14 @@ int from_string_to_clock(Clock *clock, const char *string) {
 
 //TODOO: set up flags
 // -r    : reverse the clock from %lld seconds or the format above
-// -s    : start at stop state
+// -p    : start at pause state
 // -help : display help messages
 int main(int argc, char **argv) {
 #if 0
     (void)argc; (void) argv;
 #else
     if(argc > 1) {
-        //char *number = argv[1];
-        Clock clock;
-        //clock = parse_clock_from_long(from_string_to_long(number));
-        if(from_string_to_clock(&clock, argv[1]) < 0) {
-            printf("Failed to convert from string to Clock\n");
-        } else print_clock(&clock);
+        if(parse_flags(argv[1]) < 0) printf("Fucky Wacky\n");
     }
 #endif
 
