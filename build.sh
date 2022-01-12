@@ -8,7 +8,7 @@ OUT="sopa"
 
 set -xe
 
-$CXX $SRC $FLAG `pkg-config --cflags $LIBS` -o $OUT `pkg-config --libs $LIBS`
+$CXX $SRC $FLAG -o $OUT $(pkg-config --cflags --libs $LIBS)
 
 if [[ $? -ne 0 ]]
 then
