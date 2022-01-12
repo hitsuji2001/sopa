@@ -7,14 +7,14 @@
 ### Quick Start
 ## Linux
 ```bash
-$ ./build.sh
-$ ./sopa `flags` `time`
+./build.sh
+./sopa `flags` `time`
 ```
 ### Examples
 ```bash
-$ ./sopa 69420
-$ ./sopa -r 2001s29h05m
-$ ./sopa -rp 69:420:96
+./sopa 69420
+./sopa -r 2001s29h05m
+./sopa -rp 69:420:96
 ```
 
 ## License
