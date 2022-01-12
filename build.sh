@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CXX="${CXX:-gcc}"
-SRC="*.c"
+SRC="src/*.c"
 FLAG="-Werror -Wall -Wextra -pedantic -ggdb -lm"
 LIBS="sdl2"
 OUT="sopa"
