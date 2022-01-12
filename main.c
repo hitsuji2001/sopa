@@ -111,6 +111,7 @@ int from_clock_format_to_clock(Clock *clock, const char *string) {
                 i = 0;
                 attri[j] = from_string_to_long(buffer);
                 j++;
+                memset(buffer, 0, sizeof(buffer));
             } else buffer[i++] = string[index];
             index++;
         }
@@ -154,22 +155,25 @@ int from_human_readable_format_to_clock(Clock *clock, const char *string) {
         if(is_alpha(string[index])) {
             switch (string[index]) {
                 case 'h':
-                    clock->hour += from_string_to_long(buffer);
+                    clock->hour = from_string_to_long(buffer);
                     break;
                 case 'd':
-                    clock->hour += from_string_to_long(buffer) * 24;
+                    clock->hour = from_string_to_long(buffer) * 24;
                     break;
                 case 'm':
-                    clock->minute += from_string_to_long(buffer);
+                    clock->minute = from_string_to_long(buffer);
                     break;
                 case 's':
-                    clock->second += from_string_to_long(buffer);
+                    clock->second = from_string_to_long(buffer);
                     break;
                 default:
                     return -1;
             }
             i = 0;
-        } else buffer[i++] = string[index];
+            memset(buffer, 0, sizeof(buffer));
+        } else {
+            buffer[i++] = string[index];
+        }
         index++;
     }
 
@@ -188,18 +192,19 @@ int from_string_to_clock(Clock *clock, const char *string) {
 //TODOO: expected format ./sopa [flags] [time]
 //                              argv[1] argv[2 -> n]
 
-//TODOOO: set up arguments
+//TOD: set up arguments
 // %lld           : start the clock from %lld seconds - DONE
 // %02d:%02d:%02d : start the clock from %02d:%02d:%02d - DONE
 // %dh            : start the clock from %d hours - DONE
 // %dm            : start the clock from %d minutes - DONE
 // %ds            : start the clock from %d seconds - DONE
 // %dh%m%s        : start the clock from %d hours %d minutes %d seconds - DONE
-// --NOTE: these 3 can be combined - NOT TESTED YET
+// --NOTE: these 3 can be combined
 
 //TODOO: set up flags
 // -r    : reverse the clock from %lld seconds or the format above
-// --help or -help: display help message
+// -s    : start at stop state
+// -help : display help messages
 int main(int argc, char **argv) {
 #if 0
     (void)argc; (void) argv;
