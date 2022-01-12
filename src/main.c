@@ -11,26 +11,23 @@
 int parse_flags(char *string) {
     if(!string_contains(string, '-')) return -1;
 
-    if(strlen(string) == 2) {
-        if(string[1] == 'h') {
-            printf("help\n");
-        }
-    } else {
-        if(strcmp(string, "-help") == 0) {
-            printf("help message\n");
-        }
-        else {
-            for(size_t i = 1; i < strlen(string); ++i) {
-                switch (string[i]) {
-                    case 'r':
-                        printf("reverse\n");
-                        break;
-                    case 'p':
-                        printf("pause\n");
-                        break;
-                    default:
-                        return -1;
-                }
+    if(strcmp(string, "-help") == 0) {
+        printf("help message\n");
+    }
+    else {
+        for(size_t i = 1; i < strlen(string); ++i) {
+            switch (string[i]) {
+                case 'h':
+                    printf("help\n");
+                    break;
+                case 'r':
+                    printf("reverse\n");
+                    break;
+                case 'p':
+                    printf("pause\n");
+                    break;
+                default:
+                    return -1;
             }
         }
     }
@@ -38,31 +35,26 @@ int parse_flags(char *string) {
     return 0;
 }
 
-//TODOO: expected format ./sopa [flags] [time]
-//                              argv[1] argv[2 -> n]
+int scc(int code) {
+    if(code < 0) {
+        fprintf(stderr, "SDL error: %s\n", SDL_GetError());
+        exit(1);
+    }
 
-//TODOOOOOOOOOOO: setting up SDL2
-//Draw a window
-//Draw a picture
+    return code;
+}
 
-//TODOOO: refactor code
+void *scp(void *ptr) {
+    if(ptr == NULL) {
+        fprintf(stderr, "SDL error: %s\n", SDL_GetError());
+        exit(1);
+    }
 
-//TOD: set up arguments
-// %lld           : start the clock from %lld seconds - DONE
-// %02d:%02d:%02d : start the clock from %02d:%02d:%02d - DONE
-// %dh            : start the clock from %d hours - DONE
-// %dm            : start the clock from %d minutes - DONE
-// %ds            : start the clock from %d seconds - DONE
-// %dh%m%s        : start the clock from %d hours %d minutes %d seconds - DONE
-// --NOTE: these 3 can be combined
-
-//TOD: set up flags
-// -r    : reverse the clock from %lld seconds or the format above - DONE
-// -p    : start at pause state - DONE
-// -help : display help messages
+    return ptr;
+}
 
 int main(int argc, char **argv) {
-#if 0
+#if 1
     (void)argc; (void) argv;
 #else
     Clock clock;
@@ -83,6 +75,29 @@ int main(int argc, char **argv) {
         printf("Clock start\n");
     }
 #endif
+
+    scc(SDL_Init(SDL_INIT_VIDEO));
+
+    SDL_Window *window = scp(SDL_CreateWindow("sopa", 0, 0, WINDOW_WIDTH, WINDOW_HEIGTH, SDL_WINDOW_RESIZABLE));
+    SDL_Renderer *renderer = scp(SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC));
+
+    bool quit = false;
+    while(!quit) {
+        SDL_Event event;
+        while(SDL_PollEvent(&event)) {
+            switch(event.type) {
+                case SDL_QUIT:
+                    quit = true;
+                    break;
+            }
+        }
+        scc(SDL_SetRenderDrawColor(renderer, 69, 69, 69, 255));
+        scc(SDL_RenderClear(renderer));
+
+        SDL_RenderPresent(renderer);
+    }
+
+    SDL_Quit();
 
     return 0;
 }
