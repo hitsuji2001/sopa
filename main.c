@@ -84,6 +84,15 @@ bool string_contains(const char *string, const char keyword) {
     return false;
 }
 
+int string_contains_more_than_one(const char *string, const char keyword) {
+    int count = 0;
+    for(size_t i = 0; i < strlen(string); ++i) {
+        if(string[i] == keyword) count++;
+    }
+
+    return count;
+}
+
 int from_clock_format_to_clock(Clock *clock, const char *string) {
     if(!string_contains(string, ':') || string_contains(string, '-')) {
         clock = NULL;
@@ -96,15 +105,23 @@ int from_clock_format_to_clock(Clock *clock, const char *string) {
     char buffer[10] = {0};
     long attri[3] = {0};
 
-    while(index < strlen(string)) {
-        if(string[index] == ':') {
-            i = 0;
-            attri[j] = from_string_to_long(buffer);
-            j++;
-        } else buffer[i++] = string[index];
-        index++;
+    if(string_contains_more_than_one(string, ':') > 1) {
+        while(index < strlen(string)) {
+            if(string[index] == ':') {
+                i = 0;
+                attri[j] = from_string_to_long(buffer);
+                j++;
+            } else buffer[i++] = string[index];
+            index++;
+        }
+        attri[j++] = from_string_to_long(buffer);
+    } else if (string_contains_more_than_one(string, ':') == 1) {
+        for(int i = 0; index < strlen(string); ++index) {
+            if(string[index] == ':') break;
+            buffer[i++] = string[index];
+        }
+        attri[0] = from_string_to_long(buffer);
     }
-    attri[2] = from_string_to_long(buffer);
 
     clock->hour = attri[0];
     clock->minute = attri[1];
@@ -116,24 +133,11 @@ int from_clock_format_to_clock(Clock *clock, const char *string) {
     return 0;
 }
 
-void rename_this_later(Clock *clock, const char character, const char *buffer) {
-    switch (character) {
-        case 'h':
-            clock->hour = from_string_to_long(buffer);
-            break;
-        case 'm':
-            clock->minute = from_string_to_long(buffer);
-            break;
-        case 's':
-            clock->second = from_string_to_long(buffer);
-            break;
-        default:
-            break;
-    }
-}
-
 int from_human_readable_format_to_clock(Clock *clock, const char *string) {
-    if((!string_contains(string, 'h') && !string_contains(string, 'm') && !string_contains(string, 's')) || string_contains(string, '-')) {
+    if((!string_contains(string, 'h') &&
+        !string_contains(string, 'm') && 
+        !string_contains(string, 's') &&
+        !string_contains(string, 'd')) || string_contains(string, '-')) {
         clock = NULL;
         return -1;
     }
@@ -148,7 +152,22 @@ int from_human_readable_format_to_clock(Clock *clock, const char *string) {
 
     while(index < strlen(string)) {
         if(is_alpha(string[index])) {
-            rename_this_later(clock, string[index], buffer);
+            switch (string[index]) {
+                case 'h':
+                    clock->hour += from_string_to_long(buffer);
+                    break;
+                case 'd':
+                    clock->hour += from_string_to_long(buffer) * 24;
+                    break;
+                case 'm':
+                    clock->minute += from_string_to_long(buffer);
+                    break;
+                case 's':
+                    clock->second += from_string_to_long(buffer);
+                    break;
+                default:
+                    return -1;
+            }
             i = 0;
         } else buffer[i++] = string[index];
         index++;
@@ -161,7 +180,9 @@ int from_human_readable_format_to_clock(Clock *clock, const char *string) {
 }
 
 int from_string_to_clock(Clock *clock, const char *string) {
-    return from_clock_format_to_clock(clock, string) || from_human_readable_format_to_clock(clock, string);
+    if(string_contains(string, ':') && (string_contains(string, 'h') || string_contains(string, 'm') || string_contains(string, 's') || string_contains(string, 'd'))) return -1;
+    else if(string_contains(string, ':')) return from_clock_format_to_clock(clock, string);
+    else return from_human_readable_format_to_clock(clock, string);
 }
 
 //TODOO: expected format ./sopa [flags] [time]
@@ -187,7 +208,7 @@ int main(int argc, char **argv) {
         //char *number = argv[1];
         Clock clock;
         //clock = parse_clock_from_long(from_string_to_long(number));
-        if(from_human_readable_format_to_clock(&clock, argv[1]) < 0) {
+        if(from_string_to_clock(&clock, argv[1]) < 0) {
             printf("Failed to convert from string to Clock\n");
         } else print_clock(&clock);
     }
