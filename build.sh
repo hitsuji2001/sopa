@@ -2,7 +2,7 @@
 
 CXX="${CXX:-gcc}"
 SRC="src/*.c"
-FLAG="-Werror -Wall -Wextra -pedantic -ggdb -lm"
+FLAG="-Werror -Wall -Wextra -pedantic -ggdb -lm -lSDL2_image"
 LIBS="sdl2"
 OUT="sopa"
 
