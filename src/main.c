@@ -1,12 +1,13 @@
 #include <stdlib.h>
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
 #include "../header/util.h"
 #include "../header/clock.h"
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGTH 600
+#define WINDOW_WIDTH 900
+#define WINDOW_HEIGTH 200
 
 int parse_flags(char *string) {
     if(!string_contains(string, '-')) return -1;
@@ -80,6 +81,8 @@ int main(int argc, char **argv) {
 
     SDL_Window *window = scp(SDL_CreateWindow("sopa", 0, 0, WINDOW_WIDTH, WINDOW_HEIGTH, SDL_WINDOW_RESIZABLE));
     SDL_Renderer *renderer = scp(SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC));
+    //char *ava = "ava.jpg";
+    char *bg = "bg.png";
 
     bool quit = false;
     while(!quit) {
@@ -91,8 +94,12 @@ int main(int argc, char **argv) {
                     break;
             }
         }
+        SDL_Texture *texture = scp(IMG_LoadTexture(renderer, bg));
+
         scc(SDL_SetRenderDrawColor(renderer, 69, 69, 69, 255));
         scc(SDL_RenderClear(renderer));
+
+        scc(SDL_RenderCopy(renderer, texture, NULL, NULL));
 
         SDL_RenderPresent(renderer);
     }
