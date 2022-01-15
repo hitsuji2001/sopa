@@ -2,8 +2,9 @@
 **A Stopwatch implement in C kinda like [sowon](https://github.com/tsoding/sowon)**
 
 ## Dependencies
-[SDL2](https://www.libsdl.org/)
-[SDL_image.h](https://www.libsdl.org/projects/SDL_image/)
+- [SDL2](https://www.libsdl.org/)
+
+- [SDL_image.h](https://www.libsdl.org/projects/SDL_image/)
 
 ### Quick Start
 ## Linux
