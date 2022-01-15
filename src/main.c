@@ -6,8 +6,8 @@
 #include "../header/util.h"
 #include "../header/clock.h"
 
-#define WINDOW_WIDTH 900
-#define WINDOW_HEIGTH 200
+#define WINDOW_WIDTH 1000
+#define WINDOW_HEIGTH 300
 
 int parse_flags(char *string) {
     if(!string_contains(string, '-')) return -1;
@@ -79,14 +79,27 @@ int main(int argc, char **argv) {
 
     scc(SDL_Init(SDL_INIT_VIDEO));
 
+    char *digit_file_path = "digits.png";
+#define PICTURE_WIDTH 1920
+#define PICTURE_HEIGHT 1080
+#define DIGIT_WIDTH (PICTURE_WIDTH / 11)
+#define DIGIT_HEIGHT (PICTURE_HEIGHT / 4)
+
     SDL_Window *window = scp(SDL_CreateWindow("sopa", 0, 0, WINDOW_WIDTH, WINDOW_HEIGTH, SDL_WINDOW_RESIZABLE));
     SDL_Renderer *renderer = scp(SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC));
-    //char *ava = "ava.jpg";
-    char *bg = "bg.png";
+    SDL_Texture *texture = scp(IMG_LoadTexture(renderer, digit_file_path));
+
+    SDL_Rect src_rect;
+    SDL_Rect dst_rect = {0, 0, DIGIT_WIDTH, DIGIT_HEIGHT};
 
     bool quit = false;
     while(!quit) {
         SDL_Event event;
+
+        Uint32 seconds = SDL_GetTicks() / 1000;
+        Uint32 frame = seconds % 10;
+        src_rect = (SDL_Rect){ frame * DIGIT_WIDTH, DIGIT_HEIGHT * 3, DIGIT_WIDTH, DIGIT_HEIGHT };
+
         while(SDL_PollEvent(&event)) {
             switch(event.type) {
                 case SDL_QUIT:
@@ -94,16 +107,14 @@ int main(int argc, char **argv) {
                     break;
             }
         }
-        SDL_Texture *texture = scp(IMG_LoadTexture(renderer, bg));
 
         scc(SDL_SetRenderDrawColor(renderer, 69, 69, 69, 255));
         scc(SDL_RenderClear(renderer));
 
-        scc(SDL_RenderCopy(renderer, texture, NULL, NULL));
+        scc(SDL_RenderCopy(renderer, texture, &src_rect, &dst_rect));
 
         SDL_RenderPresent(renderer);
     }
-
     SDL_Quit();
 
     return 0;
