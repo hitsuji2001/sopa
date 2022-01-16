@@ -9,6 +9,7 @@ typedef struct {
     int hour;
     int minute;
     int second;
+    int fake_second;
     bool reverse;
     bool pause;
 } Clock;

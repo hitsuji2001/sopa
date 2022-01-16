@@ -11,13 +11,17 @@ void debug_clock(const Clock *clock) {
 }
 
 void increase_clock(Clock *clock) {
-    if (clock->second < 60) clock->second++;
+    if(clock->fake_second < 60) clock->fake_second++;
     else {
-        clock->second = 0;
-        if(clock->minute < 60) clock->minute++;
+        clock->fake_second = 0;
+        if (clock->second < 60) clock->second++;
         else {
-            clock->minute = 0;
-            clock->hour++;
+            clock->second = 0;
+            if(clock->minute < 60) clock->minute++;
+            else {
+                clock->minute = 0;
+                clock->hour++;
+            }
         }
     }
 }
@@ -25,13 +29,16 @@ void increase_clock(Clock *clock) {
 void decrease_clock(Clock *clock) {
     if(clock->second == 0 && clock->minute == 0 && clock->hour == 0) return;
 
-    if (clock->second > 0) clock->second--;
+    if(clock->fake_second > 0) clock->fake_second--;
     else {
-        clock->second = 59;
-        if(clock->minute > 0) clock->minute--;
+        if (clock->second > 0) clock->second--;
         else {
-            clock->minute = 59;
-            clock->hour--;
+            clock->second = 59;
+            if(clock->minute > 0) clock->minute--;
+            else {
+                clock->minute = 59;
+                clock->hour--;
+            }
         }
     }
 }

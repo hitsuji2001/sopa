@@ -18,6 +18,7 @@
 #define WINDOW_HEIGTH DIGIT_HEIGHT
 
 #define FPS 60
+#define DRAW_INTERVAL (1e6/FPS)
 #define DELTA_TIME (1.0f/FPS)
 
 int parse_flags(char *string, Clock *clock) {
@@ -83,18 +84,18 @@ void render_digit_at(SDL_Renderer *renderer, const int digit, const int order, c
 void render_clock(SDL_Renderer *renderer, Clock *clock, const int frame, SDL_Texture *texture) {
     //TODO: if clock->hour is more than 3 digits, it will overflow
 
-    render_digit_at(renderer, clock->hour / 10, 0, frame, texture);
-    render_digit_at(renderer, clock->hour % 10, 1, frame, texture);
+    render_digit_at(renderer, clock->hour / 10, 0, (frame + 1) % NUMBER_OF_FRAMES, texture);
+    render_digit_at(renderer, clock->hour % 10, 1, (frame + 2) % NUMBER_OF_FRAMES, texture);
 
     render_digit_at(renderer, 10, 2, frame, texture);
 
-    render_digit_at(renderer, clock->minute / 10, 3, frame, texture);
-    render_digit_at(renderer, clock->minute % 10, 4, frame, texture);
+    render_digit_at(renderer, clock->minute / 10, 3, (frame + 3) % NUMBER_OF_FRAMES, texture);
+    render_digit_at(renderer, clock->minute % 10, 4, (frame + 4) % NUMBER_OF_FRAMES, texture);
 
     render_digit_at(renderer, 10, 5, frame, texture);
 
-    render_digit_at(renderer, clock->second / 10, 6, frame, texture);
-    render_digit_at(renderer, clock->second % 10, 7, frame, texture);
+    render_digit_at(renderer, clock->second / 10, 6, (frame + 2) % NUMBER_OF_FRAMES, texture);
+    render_digit_at(renderer, clock->second % 10, 7, (frame + 1) % NUMBER_OF_FRAMES, texture);
 }
 
 int main(int argc, char **argv) {
@@ -102,17 +103,17 @@ int main(int argc, char **argv) {
     (void)argc; (void) argv;
 #else
     Clock clock;
+    clock.reverse = false;
+    clock.pause = false;
     if(argc > 1) {
         if(parse_flags(argv[1], &clock) < 0) {
             if(from_string_to_clock(&clock, argv[1]) < 0) {
                 parse_clock_from_long(&clock, from_string_to_long(argv[1]));
-                print_clock(&clock);
             } else print_clock(&clock);
         } else {
             printf("Clock start with flags\n");
             if(from_string_to_clock(&clock, argv[2]) < 0) {
                 parse_clock_from_long(&clock, from_string_to_long(argv[2]));
-                print_clock(&clock);
             } else print_clock(&clock);
         }
     } else {
@@ -152,6 +153,8 @@ int main(int argc, char **argv) {
         advance_clock(&clock);
 
         SDL_RenderPresent(renderer);
+
+        SDL_Delay((int) floorf(DELTA_TIME * 1000.0f));
     }
     SDL_Quit();
 
