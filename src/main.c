@@ -6,8 +6,19 @@
 #include "../header/util.h"
 #include "../header/clock.h"
 
-#define WINDOW_WIDTH 1000
-#define WINDOW_HEIGTH 300
+#define PICTURE_WIDTH 1920
+#define PICTURE_HEIGHT 1080
+
+#define DIGIT_WIDTH (PICTURE_WIDTH / 11)
+#define DIGIT_HEIGHT (PICTURE_HEIGHT / 4)
+#define NUMBER_OF_FRAMES 4
+#define WIGGLE_SPEED 0.5f
+
+#define WINDOW_WIDTH (8 * DIGIT_WIDTH)
+#define WINDOW_HEIGTH DIGIT_HEIGHT
+
+#define FPS 60
+#define DELTA_TIME (1.0f/FPS)
 
 int parse_flags(char *string) {
     if(!string_contains(string, '-')) return -1;
@@ -54,8 +65,32 @@ void *scp(void *ptr) {
     return ptr;
 }
 
+void render_digit_at(SDL_Renderer *renderer, const int digit, const int order, const int frame, SDL_Texture *texture) {
+    SDL_Rect src_rect = { digit * DIGIT_WIDTH, DIGIT_HEIGHT * frame, DIGIT_WIDTH, DIGIT_HEIGHT };
+    SDL_Rect dst_rect = { DIGIT_WIDTH * order, 0                   , DIGIT_WIDTH, DIGIT_HEIGHT };
+
+    scc(SDL_RenderCopy(renderer, texture, &src_rect, &dst_rect));
+}
+
+void render_clock(SDL_Renderer *renderer, Clock *clock, const int frame, SDL_Texture *texture) {
+    //TODO: if clock->hour is more than 3 digits, it will overflow
+
+    render_digit_at(renderer, clock->hour / 10, 0, frame, texture);
+    render_digit_at(renderer, clock->hour % 10, 1, frame, texture);
+
+    render_digit_at(renderer, 10, 2, frame, texture);
+
+    render_digit_at(renderer, clock->minute / 10, 3, frame, texture);
+    render_digit_at(renderer, clock->minute % 10, 4, frame, texture);
+
+    render_digit_at(renderer, 10, 5, frame, texture);
+
+    render_digit_at(renderer, clock->second / 10, 6, frame, texture);
+    render_digit_at(renderer, clock->second % 10, 7, frame, texture);
+}
+
 int main(int argc, char **argv) {
-#if 1
+#if 0
     (void)argc; (void) argv;
 #else
     Clock clock;
@@ -80,25 +115,17 @@ int main(int argc, char **argv) {
     scc(SDL_Init(SDL_INIT_VIDEO));
 
     char *digit_file_path = "digits.png";
-#define PICTURE_WIDTH 1920
-#define PICTURE_HEIGHT 1080
-#define DIGIT_WIDTH (PICTURE_WIDTH / 11)
-#define DIGIT_HEIGHT (PICTURE_HEIGHT / 4)
 
     SDL_Window *window = scp(SDL_CreateWindow("sopa", 0, 0, WINDOW_WIDTH, WINDOW_HEIGTH, SDL_WINDOW_RESIZABLE));
     SDL_Renderer *renderer = scp(SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC));
     SDL_Texture *texture = scp(IMG_LoadTexture(renderer, digit_file_path));
 
-    SDL_Rect src_rect;
-    SDL_Rect dst_rect = {0, 0, DIGIT_WIDTH, DIGIT_HEIGHT};
-
     bool quit = false;
     while(!quit) {
         SDL_Event event;
 
-        Uint32 seconds = SDL_GetTicks() / 1000;
-        Uint32 frame = seconds % 10;
-        src_rect = (SDL_Rect){ frame * DIGIT_WIDTH, DIGIT_HEIGHT * 3, DIGIT_WIDTH, DIGIT_HEIGHT };
+        // Number of frame we are currently in
+        Uint32 frame = (Uint32)(SDL_GetTicks() * DELTA_TIME * WIGGLE_SPEED) % NUMBER_OF_FRAMES;
 
         while(SDL_PollEvent(&event)) {
             switch(event.type) {
@@ -111,7 +138,7 @@ int main(int argc, char **argv) {
         scc(SDL_SetRenderDrawColor(renderer, 69, 69, 69, 255));
         scc(SDL_RenderClear(renderer));
 
-        scc(SDL_RenderCopy(renderer, texture, &src_rect, &dst_rect));
+        render_clock(renderer, &clock, frame, texture);
 
         SDL_RenderPresent(renderer);
     }
