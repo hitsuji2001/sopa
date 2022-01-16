@@ -20,27 +20,35 @@
 #define FPS 60
 #define DELTA_TIME (1.0f/FPS)
 
-int parse_flags(char *string) {
+int parse_flags(char *string, Clock *clock) {
     if(!string_contains(string, '-')) return -1;
 
-    if(strcmp(string, "-help") == 0) {
-        printf("help message\n");
+    if(string_contains_more_than_one(string, '-') == 2) {
+        if(strcmp(string, "--help") == 0) {
+            printf("help message\n");
+            exit (0);
+        }
     }
-    else {
-        for(size_t i = 1; i < strlen(string); ++i) {
-            switch (string[i]) {
-                case 'h':
-                    printf("help\n");
-                    break;
-                case 'r':
-                    printf("reverse\n");
-                    break;
-                case 'p':
-                    printf("pause\n");
-                    break;
-                default:
-                    return -1;
-            }
+
+    clock->reverse = false;
+    clock->pause = false;
+
+    for(size_t i = 1; i < strlen(string); ++i) {
+        switch (string[i]) {
+            case 'h':
+                printf("help\n");
+                exit(0);
+            case 'r':
+                clock->reverse = true;
+                printf("reverse\n");
+                break;
+            case 'p':
+                clock->pause = true;
+                printf("pause\n");
+                break;
+            default:
+                printf("Unrecognized flags `%s`\n", string);
+                exit(1);
         }
     }
 
@@ -95,21 +103,23 @@ int main(int argc, char **argv) {
 #else
     Clock clock;
     if(argc > 1) {
-        if(parse_flags(argv[1]) < 0) {
+        if(parse_flags(argv[1], &clock) < 0) {
             if(from_string_to_clock(&clock, argv[1]) < 0) {
-                clock = parse_clock_from_long(from_string_to_long(argv[1]));
+                parse_clock_from_long(&clock, from_string_to_long(argv[1]));
                 print_clock(&clock);
             } else print_clock(&clock);
         } else {
             printf("Clock start with flags\n");
             if(from_string_to_clock(&clock, argv[2]) < 0) {
-                clock = parse_clock_from_long(from_string_to_long(argv[2]));
+                parse_clock_from_long(&clock, from_string_to_long(argv[2]));
                 print_clock(&clock);
             } else print_clock(&clock);
         }
     } else {
+        parse_clock_from_long(&clock, 0);
         printf("Clock start\n");
     }
+    debug_clock(&clock);
 #endif
 
     scc(SDL_Init(SDL_INIT_VIDEO));
@@ -139,6 +149,7 @@ int main(int argc, char **argv) {
         scc(SDL_RenderClear(renderer));
 
         render_clock(renderer, &clock, frame, texture);
+        advance_clock(&clock);
 
         SDL_RenderPresent(renderer);
     }

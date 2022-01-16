@@ -4,6 +4,12 @@ void print_clock(const Clock *clock) {
     printf("%02d:%02d:%02d\n", clock->hour, clock->minute, clock->second);
 }
 
+void debug_clock(const Clock *clock) {
+    print_clock(clock);
+    printf("reverse: %d\n", clock->reverse);
+    printf("pause: %d\n", clock->pause);
+}
+
 void increase_clock(Clock *clock) {
     if (clock->second < 60) clock->second++;
     else {
@@ -30,14 +36,21 @@ void decrease_clock(Clock *clock) {
     }
 }
 
-Clock parse_clock_from_long(const long time) {
-    Clock clock;
+void advance_clock(Clock *clock) {
+    if(clock->pause) return;
 
-    clock.hour = time / (60 * 60);
-    clock.minute = (time % (60 * 60)) / 60;
-    clock.second = (time % (60 * 60)) % 60;
+    if(!clock->reverse) increase_clock(clock);
+    else decrease_clock(clock);
 
-    return clock;
+    return;
+}
+
+int parse_clock_from_long(Clock *clock, const long time) {
+    clock->hour = time / (60 * 60);
+    clock->minute = (time % (60 * 60)) / 60;
+    clock->second = (time % (60 * 60)) % 60;
+
+    return 0;
 }
 
 int exceeded_time(int *time) {

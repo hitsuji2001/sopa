@@ -14,12 +14,14 @@ typedef struct {
 } Clock;
 
 void print_clock(const Clock *clock);
+void debug_clock(const Clock *clock);
 void increase_clock(Clock *clock);
 void decrease_clock(Clock *clock);
+void advance_clock(Clock *clock);
 
 int exceeded_time(int *time);
 
-Clock parse_clock_from_long(const long time);
+int parse_clock_from_long(Clock *clock, const long time);
 int from_clock_format_to_clock(Clock *clock, const char *string);
 int from_human_readable_format_to_clock(Clock *clock, const char *string);
 int from_string_to_clock(Clock *clock, const char *string);
