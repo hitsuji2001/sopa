@@ -31,6 +31,7 @@ void decrease_clock(Clock *clock) {
 
     if(clock->fake_second > 0) clock->fake_second--;
     else {
+        clock->fake_second = 59;
         if (clock->second > 0) clock->second--;
         else {
             clock->second = 59;
