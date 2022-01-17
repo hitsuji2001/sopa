@@ -16,6 +16,7 @@ typedef struct {
     int minute;
     int second;
     int tick;
+
     bool reverse;
     bool pause;
 } Clock;

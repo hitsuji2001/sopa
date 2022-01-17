@@ -14,10 +14,12 @@
 
 int main(int argc, char **argv) {
     Clock clock;
-    clock.reverse = false;
-    clock.pause = false;
 
-    parse_clock_from_cmd(&clock, argc, argv);
+    if (parse_clock_from_cmd(&clock, argc, argv) < 0) {
+        fprintf(stderr, "Can't not recognize your syntax\n");
+        fprintf(stdout, "Include '-h' or '--help' for more information\n");
+        exit(1);
+    }
 
     debug_clock(&clock);
 
@@ -41,18 +43,35 @@ int main(int argc, char **argv) {
                 case SDL_QUIT:
                     quit = true;
                     break;
+                case SDL_KEYDOWN: {
+                  switch (event.key.keysym.sym) {
+                      case SDLK_SPACE:
+                          clock.pause = !clock.pause;
+                          break;
+                      case SDLK_r:
+                          parse_clock_from_cmd(&clock, argc, argv);
+                          clock.pause = true;
+                          break;
+                  }
+               }
             }
         }
 
+        //Render start
         scc(SDL_SetRenderDrawColor(renderer, 69, 69, 69, 255));
         scc(SDL_RenderClear(renderer));
 
         render_clock(renderer, &clock, frame, texture);
-        advance_clock(&clock);
 
         SDL_RenderPresent(renderer);
 
         SDL_Delay((int) floorf(DELTA_TIME * 1000.0f));
+        //Render end
+        
+        //update
+        if (clock.pause) scc(SDL_SetTextureColorMod(texture, 220, 120, 120));
+        else scc(SDL_SetTextureColorMod(texture, 255, 255, 255));
+        advance_clock(&clock);
     }
 
     SDL_Quit();

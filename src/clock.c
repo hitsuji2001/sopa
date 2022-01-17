@@ -1,13 +1,13 @@
 #include "../header/clock.h"
 
 void print_clock(const Clock *clock) {
-    printf("%02d:%02d:%02d\n", clock->hour, clock->minute, clock->second);
+    fprintf(stdout, "%02d:%02d:%02d\n", clock->hour, clock->minute, clock->second);
 }
 
 void debug_clock(const Clock *clock) {
     print_clock(clock);
-    printf("reverse: %d\n", clock->reverse);
-    printf("pause: %d\n", clock->pause);
+    fprintf(stdout, "reverse: %d\n", clock->reverse);
+    fprintf(stdout, "pause: %d\n", clock->pause);
 }
 
 void increase_clock(Clock *clock) {
@@ -54,7 +54,18 @@ void advance_clock(Clock *clock) {
 }
 
 void display_help() {
-    fprintf(stdout, "help\n");
+    fprintf(stdout, "-------------------------------------------------------------------------------------\n");
+    fprintf(stdout, "[help]\n");
+    fprintf(stdout, "Syntax: sopa [flags] [time]\n");
+    fprintf(stdout, "[Flags]\n");
+    fprintf(stdout, "-h or --help: display this help messages\n");
+    fprintf(stdout, "-p: start the clock in pause state\n");
+    fprintf(stdout, "-r: start the clock in reverse state\n");
+    fprintf(stdout, "[Time format]\n");
+    fprintf(stdout, "number: in seconds\n");
+    fprintf(stdout, "hh:mm:ss\n");
+    fprintf(stdout, "...d...h...m...s: with ... is your time in days, hours, minutes, seconds respectively\n");
+    fprintf(stdout, "-------------------------------------------------------------------------------------\n");
 }
 
 void render_digit_at(SDL_Renderer *renderer, const int digit, const int order, const int frame, SDL_Texture *texture) {
@@ -82,6 +93,8 @@ void render_clock(SDL_Renderer *renderer, Clock *clock, const int frame, SDL_Tex
 }
 
 int parse_clock_from_long(Clock *clock, const long time) {
+    if(time < 0) return -1;
+
     clock->hour = time / (60 * 60);
     clock->minute = (time % (60 * 60)) / 60;
     clock->second = (time % (60 * 60)) % 60;
@@ -243,9 +256,9 @@ int parse_clock_from_cmd(Clock *clock, int argc, char **argv) {
     } else if (argc == 3) { // Provided flags and time
         parse_flags_for_clock(clock, argv[1]);
         if (parse_clock_from_string(clock, argv[2]) < 0) return parse_clock_from_long(clock, from_string_to_long(argv[2]));
-    } else { // Unreachable
-        fprintf(stderr, "Too much arguments provided\n");
-        display_help();
+    } else { // Not suported format
+        fprintf(stderr, "Too many arguments\n");
+        fprintf(stderr, "See '-h' or '--help' for more information\n");
         exit(1);
     }
 
