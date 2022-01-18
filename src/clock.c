@@ -1,16 +1,6 @@
 #include "../header/clock.h"
 
-void print_clock(const Clock *clock) {
-    fprintf(stdout, "%02d:%02d:%02d\n", clock->hour, clock->minute, clock->second);
-}
-
-void debug_clock(const Clock *clock) {
-    print_clock(clock);
-    fprintf(stdout, "reverse: %d\n", clock->reverse);
-    fprintf(stdout, "pause: %d\n", clock->pause);
-}
-
-void increase_clock(Clock *clock) {
+void clock_increase(Clock *clock) {
     if (clock->tick < 60) clock->tick++;
     else {
         clock->tick = 0;
@@ -26,7 +16,7 @@ void increase_clock(Clock *clock) {
     }
 }
 
-void decrease_clock(Clock *clock) {
+void clock_decrease(Clock *clock) {
     if (clock->second == 0 && clock->minute == 0 && clock->hour == 0) return;
 
     if (clock->tick > 0) clock->tick--;
@@ -44,11 +34,11 @@ void decrease_clock(Clock *clock) {
     }
 }
 
-void advance_clock(Clock *clock) {
+void clock_advance(Clock *clock) {
     if (clock->pause) return;
 
-    if (!clock->reverse) increase_clock(clock);
-    else decrease_clock(clock);
+    if (!clock->reverse) clock_increase(clock);
+    else clock_decrease(clock);
 
     return;
 }
@@ -66,6 +56,15 @@ void display_help() {
     fprintf(stdout, "hh:mm:ss\n");
     fprintf(stdout, "...d...h...m...s: with ... is your time in days, hours, minutes, seconds respectively\n");
     fprintf(stdout, "-------------------------------------------------------------------------------------\n");
+}
+
+void clock_set(const Clock *src_clock, Clock *dst_clock) {
+    dst_clock->hour = src_clock->hour;
+    dst_clock->minute = src_clock->minute;
+    dst_clock->second = src_clock->second;
+    dst_clock->tick = src_clock->tick;
+    dst_clock->reverse = src_clock->reverse;
+    dst_clock->pause = src_clock->pause;
 }
 
 float calculate_scaler(SDL_Window *window, float *fit_scale, float user_scale) {
@@ -95,7 +94,7 @@ void get_initial_draw_position(int *x, int *y, const int order, SDL_Window *wind
 }
 
 void render_digit_at(SDL_Renderer *renderer, const int digit, const int order, const int frame,
-        float *fit_scale, float user_scale, SDL_Texture *texture, SDL_Window *window) {
+                    float *fit_scale, float user_scale, SDL_Texture *texture, SDL_Window *window) {
     int pen_x, pen_y;
     get_initial_draw_position(&pen_x, &pen_y, order, window, fit_scale, user_scale);
     SDL_Rect src_rect = { 
@@ -115,7 +114,7 @@ void render_digit_at(SDL_Renderer *renderer, const int digit, const int order, c
 }
 
 void render_clock(SDL_Renderer *renderer, Clock *clock, const int frame, 
-        float *fit_scale, float user_scale, SDL_Texture *texture, SDL_Window *window) {
+                float *fit_scale, float user_scale, SDL_Texture *texture, SDL_Window *window) {
     //TODO: if clock->hour is more than 3 digits, it will overflow
 
     render_digit_at(renderer, clock->hour / 10, 0, (frame + 1) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window);
@@ -281,6 +280,7 @@ int parse_clock_from_cmd(Clock *clock, int argc, char **argv) {
     clock->reverse = false;
     clock->pause = false;
 
+    //TODO: Think of a better way to parse these things
     if (argc == 1) return parse_clock_from_long(clock, 0); // Provided no flag and no time
     else if (argc == 2) {
         if (string_contains(argv[1], '-')) { // Provided flags but no time

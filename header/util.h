@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 
+#include "./magic_constants.h"
+
 bool is_alpha(const char character);
 bool string_contains(const char *string, const char keyword);
 

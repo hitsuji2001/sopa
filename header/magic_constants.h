@@ -1,0 +1,19 @@
+#ifndef __MAGIC_CONSTANTS_H__
+#define __MAGIC_CONSTANTS_H__
+
+#define PICTURE_WIDTH 1920
+#define PICTURE_HEIGHT 1080
+
+#define DIGIT_WIDTH (PICTURE_WIDTH / 11)
+#define DIGIT_HEIGHT (PICTURE_HEIGHT / 4)
+#define NUMBER_OF_FRAMES 4
+#define WIGGLE_SPEED 0.5f
+#define MAX_SCALE 1.0f
+
+#define WINDOW_WIDTH (8 * DIGIT_WIDTH)
+#define WINDOW_HEIGTH DIGIT_HEIGHT
+
+#define FPS 60
+#define DELTA_TIME (1.0f/FPS)
+
+#endif
