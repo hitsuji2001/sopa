@@ -68,28 +68,68 @@ void display_help() {
     fprintf(stdout, "-------------------------------------------------------------------------------------\n");
 }
 
-void render_digit_at(SDL_Renderer *renderer, const int digit, const int order, const int frame, SDL_Texture *texture) {
-    SDL_Rect src_rect = { digit * DIGIT_WIDTH, DIGIT_HEIGHT * frame, DIGIT_WIDTH, DIGIT_HEIGHT };
-    SDL_Rect dst_rect = { DIGIT_WIDTH * order, 0                   , DIGIT_WIDTH, DIGIT_HEIGHT };
+float calculate_scaler(SDL_Window *window, float *fit_scale, float user_scale) {
+    int w, h;
+    SDL_GetWindowSize(window, &w, &h);
+
+    const float window_ratio = w / h;
+    const float text_ratio = (DIGIT_WIDTH * 8) / DIGIT_HEIGHT;
+    
+    if(text_ratio > window_ratio) *fit_scale = (float)w / (DIGIT_WIDTH * 8);
+    else *fit_scale = (float)h / DIGIT_HEIGHT;
+
+    return *fit_scale * user_scale;
+}
+
+void get_initial_draw_position(int *x, int *y, const int order, SDL_Window *window, float *fit_scale, float user_scale) {
+    float scaler = calculate_scaler(window, fit_scale, user_scale);
+    float time_table_width = DIGIT_WIDTH * 8 * scaler;
+    float time_table_height = DIGIT_HEIGHT * scaler;
+    int w, h;
+    SDL_GetWindowSize(window, &w, &h);
+
+    *x = (int)((DIGIT_WIDTH * scaler) * order + (w - time_table_width) / 2);
+    *y = (int)((h - time_table_height) / 2);
+
+    return;
+}
+
+void render_digit_at(SDL_Renderer *renderer, const int digit, const int order, const int frame,
+        float *fit_scale, float user_scale, SDL_Texture *texture, SDL_Window *window) {
+    int pen_x, pen_y;
+    get_initial_draw_position(&pen_x, &pen_y, order, window, fit_scale, user_scale);
+    SDL_Rect src_rect = { 
+                            digit * DIGIT_WIDTH,
+                            DIGIT_HEIGHT * frame,
+                            DIGIT_WIDTH, 
+                            DIGIT_HEIGHT 
+                        };
+    SDL_Rect dst_rect = {
+                            pen_x,
+                            pen_y, 
+                            DIGIT_WIDTH * user_scale * *fit_scale,
+                            DIGIT_HEIGHT * user_scale * *fit_scale 
+                        };
 
     scc(SDL_RenderCopy(renderer, texture, &src_rect, &dst_rect));
 }
 
-void render_clock(SDL_Renderer *renderer, Clock *clock, const int frame, SDL_Texture *texture) {
+void render_clock(SDL_Renderer *renderer, Clock *clock, const int frame, 
+        float *fit_scale, float user_scale, SDL_Texture *texture, SDL_Window *window) {
     //TODO: if clock->hour is more than 3 digits, it will overflow
 
-    render_digit_at(renderer, clock->hour / 10, 0, (frame + 1) % NUMBER_OF_FRAMES, texture);
-    render_digit_at(renderer, clock->hour % 10, 1, (frame + 2) % NUMBER_OF_FRAMES, texture);
+    render_digit_at(renderer, clock->hour / 10, 0, (frame + 1) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window);
+    render_digit_at(renderer, clock->hour % 10, 1, (frame + 2) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window);
 
-    render_digit_at(renderer, 10, 2, frame, texture);
+    render_digit_at(renderer, 10, 2, frame, fit_scale, user_scale, texture, window);
 
-    render_digit_at(renderer, clock->minute / 10, 3, (frame + 3) % NUMBER_OF_FRAMES, texture);
-    render_digit_at(renderer, clock->minute % 10, 4, (frame + 4) % NUMBER_OF_FRAMES, texture);
+    render_digit_at(renderer, clock->minute / 10, 3, (frame + 3) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window);
+    render_digit_at(renderer, clock->minute % 10, 4, (frame + 4) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window);
 
-    render_digit_at(renderer, 10, 5, frame, texture);
+    render_digit_at(renderer, 10, 5, frame, fit_scale, user_scale, texture, window);
 
-    render_digit_at(renderer, clock->second / 10, 6, (frame + 2) % NUMBER_OF_FRAMES, texture);
-    render_digit_at(renderer, clock->second % 10, 7, (frame + 1) % NUMBER_OF_FRAMES, texture);
+    render_digit_at(renderer, clock->second / 10, 6, (frame + 2) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window);
+    render_digit_at(renderer, clock->second % 10, 7, (frame + 1) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window);
 }
 
 int parse_clock_from_long(Clock *clock, const long time) {

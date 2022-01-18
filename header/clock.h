@@ -10,6 +10,7 @@
 #define DIGIT_HEIGHT (PICTURE_HEIGHT / 4)
 #define NUMBER_OF_FRAMES 4
 #define WIGGLE_SPEED 0.5f
+#define MAX_SCALE 1.0f
 
 typedef struct {
     int hour;
@@ -28,8 +29,10 @@ void decrease_clock(Clock *clock);
 void advance_clock(Clock *clock);
 void display_help();
 
-void render_digit_at(SDL_Renderer *renderer, const int digit, const int order, const int frame, SDL_Texture *texture);
-void render_clock(SDL_Renderer *renderer, Clock *clock, const int frame, SDL_Texture *texture);
+float calculate_scaler(SDL_Window *window, float *fit_scale, float user_scale);
+void get_initial_draw_position(int *x, int *y, const int order, SDL_Window *window, float *fit_scale, float user_scale);
+void render_digit_at(SDL_Renderer *renderer, const int digit, const int order, const int frame, float *fit_scale, float user_scale, SDL_Texture *texture, SDL_Window *window);
+void render_clock(SDL_Renderer *renderer, Clock *clock, const int frame, float *fit_scale, float user_scale, SDL_Texture *texture, SDL_Window *window);
 
 int exceeded_time(int *time);
 

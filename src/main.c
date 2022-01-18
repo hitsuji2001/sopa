@@ -14,6 +14,8 @@
 
 int main(int argc, char **argv) {
     Clock clock;
+    float user_scale = MAX_SCALE;
+    float fit_scale = MAX_SCALE;
 
     if (parse_clock_from_cmd(&clock, argc, argv) < 0) {
         fprintf(stderr, "Can't not recognize your syntax\n");
@@ -21,11 +23,9 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    debug_clock(&clock);
-
     scc(SDL_Init(SDL_INIT_VIDEO));
 
-    char *digit_file_path = "digits.png";
+    const char *digit_file_path = "digits.png";
 
     SDL_Window *window = scp(SDL_CreateWindow("sopa", 0, 0, WINDOW_WIDTH, WINDOW_HEIGTH, SDL_WINDOW_RESIZABLE));
     SDL_Renderer *renderer = scp(SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC));
@@ -49,8 +49,29 @@ int main(int argc, char **argv) {
                           clock.pause = !clock.pause;
                           break;
                       case SDLK_r:
+                          // TODO: Too much calculation
+                          // store it somewhere else
                           parse_clock_from_cmd(&clock, argc, argv);
                           clock.pause = true;
+                          break;
+                      case SDLK_q:
+                          quit = true;
+                          break;
+                      case SDLK_MINUS:
+                          user_scale -= 0.1f;
+                          break;
+                      case SDLK_PLUS:
+                          user_scale += 0.1f;
+                          break;
+                      case SDLK_EQUALS:
+                          user_scale += 0.1f;
+                          break;
+                      case SDLK_F11: {
+                          Uint32 window_flags;
+                          scc(window_flags = SDL_GetWindowFlags(window));
+                          if(window_flags & SDL_WINDOW_FULLSCREEN_DESKTOP) scc(SDL_SetWindowFullscreen(window, 0));
+                          else scc(SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP));
+                          }
                           break;
                   }
                }
@@ -61,7 +82,7 @@ int main(int argc, char **argv) {
         scc(SDL_SetRenderDrawColor(renderer, 69, 69, 69, 255));
         scc(SDL_RenderClear(renderer));
 
-        render_clock(renderer, &clock, frame, texture);
+        render_clock(renderer, &clock, frame, &fit_scale, user_scale, texture, window);
 
         SDL_RenderPresent(renderer);
 
