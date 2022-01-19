@@ -12,7 +12,16 @@ OUT="sopa"
 set -xe
 
 process_image() {
-    $CXX $SRC_IMAGE $DEBUG_FLAG -o $PNG_OUT
+    if [[ "$1" == "--release" ]]
+    then
+        $CXX $SRC_IMAGE $RELEASE_FLAG -o $PNG_OUT
+    elif [[ "$1" == "--debug" ]]
+    then
+        $CXX $SRC_IMAGE $DEBUG_FLAG -o $PNG_OUT
+    else
+        return 1
+    fi
+
     if [[ $? -ne 0 ]]
     then
         echo "Can not parse image to c file"
@@ -30,11 +39,11 @@ then
 else
     if [[ "$1" == "--release" ]]
     then
-        process_image
+        process_image $1
         $CXX $SRC_APP $RELEASE_FLAG -o $OUT $(pkg-config --cflags --libs $LIBS)
     elif [[ "$1" == "--debug" ]]
     then
-        process_image
+        process_image $1
         $CXX $SRC_APP $DEBUG_FLAG -o $OUT $(pkg-config --cflags --libs $LIBS)
     else
         echo "There are only 2 flags: '--release' and '--debug'"
