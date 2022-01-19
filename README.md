@@ -18,7 +18,6 @@ and it portable (i think)
 
 ```bash
 $ sudo apt-get install libsdl2-dev
-$ sudo apt-get install libsdl2-image-dev
 ```
 
 ##### Compile and run the project
@@ -36,18 +35,19 @@ $ ./sopa
 ### MacOS
 
 
-I don't know how, I'm not that rich to buy a MacBook or something.  
+I don't know how, I'm not that rich, can't afford a MacBook or an apple.  
 
 ---
+
+### Usage
+
+Count the time forward and backward
 
 ### Syntax
 
----
-
 ```bash
-./sopa **[Flags]** **[Time]**
+./sopa [Flags] [Time]
 ```
-
 
 #### Flags
 
@@ -57,10 +57,8 @@ I don't know how, I'm not that rich to buy a MacBook or something.
 | -p           | Start the clock in pause state               |
 | -r           | Start the clock by counting in reverse order |
 
-The `-p` flag and `-r` flag can be combinded with each other to start the clock   
+The `-p` flag and `-r` flag can be combinded with each other to start the clock 
 in pause state and counting backward.
-
----
 
 #### Time format
 
@@ -71,23 +69,19 @@ in pause state and counting backward.
 | 3) xx`d`xx`h`xx`m`xx`s` | Start the clock from `xx` days `xx` hours `xx` minutes and `xx` seconds |
 
 The 2) format can have some arguments ommited.  
-    Eg: 69:4 -> convert to 69:04:00, or even 69: -> convert to 69:00:00  
+    `Eg`: 69:4 -> convert to 69:04:00, or even 69: -> convert to 69:00:00  
 The 3) format can also have some arguments ommited, and can be in any order.  
-    Eg: 2d, 2s9h3m, ...  
+    `Eg`: 2d, 2s9h3m, ...  
 And every format has overflown protection which means you can input 69:420:96 and it will format it correctly  
-
----
 
 ### Examples
 
 ```bash
 $ ./sopa 69420
-```
-```bash
 $ ./sopa -r 2001s29h05m
-```
-```bash
 $ ./sopa -rp 69:420:96
+$ ./sopa -p 3h4m5s
+$ ./sopa -r 2d
 ```
 
 ---
@@ -103,8 +97,6 @@ $ ./sopa -rp 69:420:96
 | <kbd>=</kbd>   or   <kbd>+</kbd> | Zoom in                    |
 | <kbd>0</kbd>                     | Zoom back to the original  |
 | <kbd>F11</kbd>                   | Toggle full screen         |
-
----
 
 ## License
 [MIT](./LICENSE)
