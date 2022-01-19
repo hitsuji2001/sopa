@@ -3,12 +3,8 @@
 **A Stopwatch implement in C kinda like (or exactly like) [sowon](https://github.com/tsoding/sowon)**  
 and it portable (i think)
 
----
-
 ## Dependencies
 - [SDL2](https://www.libsdl.org/download-2.0.php)
-
----
 
 ## Demo
 
@@ -31,18 +27,62 @@ $ ./build.sh --release
 $ ./sopa 
 ```
 
----
-
 ### Windows
 
-[TODO]  
+##### Install dependencies
+
+- **NOTE**: Assuming you run this in [Visual Studio Code](https://code.visualstudio.com/), have [git](https://git-scm.com/download/) installed and MinGW was installed to `C:\MinGW`
+
+- Download and set up `SDL2`:  
+    - Download the `SDL2-devel-2.0.20-mingw.tar.gz` from [here](https://www.libsdl.org/download-2.0.php):
+    - Extract it with your tool of choice and go to folder `i686-w64-mingw32`
+    - Copy all of the folder's contents to your `C:\MinGW` folder
+
+- Download `pkg-config` for Windows:  
+    - Go to [here](http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/)
+    - Download the file `pkg-config_0.26-1_win32.zip`
+    - Extract the file `bin/pkg-config.exe` to `C:\MinGW\bin`
+    - Download the file `gettext-runtime_0.18.1.1-2_win32.zip`
+    - Extract the file `bin/intl.dll` to `C:\MinGW\bin`
+    - Go to [here](http://ftp.gnome.org/pub/gnome/binaries/win32/glib/2.28)
+    - Download the file `glib_2.28.8-1_win32.zip`
+    - Extract the file `bin/libglib-2.0-0.dll` to `C:\MinGW\bin`
+
+- References: [Video tutorial for setting up SDL2](https://www.youtube.com/watch?v=DQ-NBjBFLJ4), [pkg-config Installation](https://stackoverflow.com/questions/1710922/how-to-install-pkg-config-in-windows/25605631)
+
+##### Compile and run the project
+
+```console
+> cd path\to\sopa
+> ./build.sh --release
+> ./sopa
+```
 
 ### MacOS
 
-[TODO]  
-I don't know how, I'm not that rich, can't afford a MacBook or an apple.  
+##### Install dependencies
 
----
+- Install `SDL2`:
+
+```bash
+$ brew install sdl2
+```
+
+- Install `pkg-config`:
+
+```bash
+$ brew install pkg-config
+```
+
+##### Compile and run the project
+
+```bash
+$ ./build.sh --release
+$ ./sopa
+```
+
+I don't know how, I'm not that rich, can't afford a MacBook or an apple. So I think the command for installation and running is correct.  
+If it is incorrect please tell me how to do it :)
 
 ### Usage
 
