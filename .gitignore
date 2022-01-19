@@ -2,3 +2,4 @@ sopa
 todo.c
 *.jpg
 png2c
+/header/digits.h
