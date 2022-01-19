@@ -10,6 +10,10 @@ and it portable (i think)
 
 ---
 
+## Demo
+
+![demo](./demo.gif)
+
 ## Quick Start
 
 ### Linux
@@ -31,17 +35,18 @@ $ ./sopa
 
 ### Windows
 
+[TODO]  
 
 ### MacOS
 
-
+[TODO]  
 I don't know how, I'm not that rich, can't afford a MacBook or an apple.  
 
 ---
 
 ### Usage
 
-Count the time forward and backward
+It's a clock :)
 
 ### Syntax
 
@@ -82,21 +87,22 @@ $ ./sopa -r 2001s29h05m
 $ ./sopa -rp 69:420:96
 $ ./sopa -p 3h4m5s
 $ ./sopa -r 2d
+$ ./sopa -p 69420s
 ```
 
 ---
 
 ### Control
 
-| Key                              | Usage                      |
-| -------------------------------- | -------------------------- |
-| <kbd>SPACE</kbd>                 | Pause or unpause the clock |
-| <kbd>r</kbd>                     | Reset the clock            |
-| <kbd>q</kbd>                     | Quit                       |
-| <kbd>-</kbd>                     | Zoom out                   |
-| <kbd>=</kbd>   or   <kbd>+</kbd> | Zoom in                    |
-| <kbd>0</kbd>                     | Zoom back to the original  |
-| <kbd>F11</kbd>                   | Toggle full screen         |
+| Key                              | Usage                                 |
+| -------------------------------- | ------------------------------------- |
+| <kbd>SPACE</kbd>                 | Pause or unpause the clock            |
+| <kbd>r</kbd>                     | Reset the clock to the original state |
+| <kbd>q</kbd>                     | Quit                                  |
+| <kbd>-</kbd>                     | Zoom out                              |
+| <kbd>=</kbd>   or   <kbd>+</kbd> | Zoom in                               |
+| <kbd>0</kbd>                     | Zoom back to the original             |
+| <kbd>F11</kbd>                   | Toggle full screen                    |
 
 ## License
 [MIT](./LICENSE)
