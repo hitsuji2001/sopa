@@ -23,6 +23,23 @@ long from_string_to_long(const char *string) {
     return number;
 }
 
+int get_number_of_digit(long number) {
+    int count = 0;
+    while(number > 0) {
+        count++;
+        number /= 10;
+    }
+    return count;
+}
+
+int get_digit(long number, int n) {
+    int count = get_number_of_digit(number);
+    if(count <= n) return -1;
+
+    int res = number / pow(10, count - n - 1);
+    return res % 10;
+}
+
 int string_contains_more_than_one(const char *string, const char keyword) {
     int count = 0;
     for(size_t i = 0; i < strlen(string); ++i) {

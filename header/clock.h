@@ -20,10 +20,10 @@ void clock_set(const Clock *src_clock, Clock *dst_clock);
 
 void display_help();
 
-float calculate_scaler(SDL_Window *window, float *fit_scale, float user_scale);
+float calculate_scaler(SDL_Window *window, float *fit_scale, float user_scale, const int hour_offset);
 
-void get_initial_draw_position(int *x, int *y, const int order, SDL_Window *window, float *fit_scale, float user_scale);
-void render_digit_at(SDL_Renderer *renderer, const int digit, const int order, const int frame, float *fit_scale, float user_scale, SDL_Texture *texture, SDL_Window *window);
+void get_initial_draw_position(int *x, int *y, const int order, SDL_Window *window, float *fit_scale, float user_scale, const int hour_offset);
+void render_digit_at(SDL_Renderer *renderer, const int digit, const int order, const int frame, float *fit_scale, float user_scale, SDL_Texture *texture, SDL_Window *window, const int hour_offset);
 void render_clock(SDL_Renderer *renderer, Clock *clock, const int frame, float *fit_scale, float user_scale, SDL_Texture *texture, SDL_Window *window);
 
 int exceeded_time(int *time);

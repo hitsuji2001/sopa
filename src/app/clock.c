@@ -67,22 +67,23 @@ void clock_set(const Clock *src_clock, Clock *dst_clock) {
     dst_clock->pause = src_clock->pause;
 }
 
-float calculate_scaler(SDL_Window *window, float *fit_scale, float user_scale) {
+float calculate_scaler(SDL_Window *window, float *fit_scale, float user_scale, const int hour_offset) {
     int w, h;
     SDL_GetWindowSize(window, &w, &h);
+    int text_width = DIGIT_WIDTH * (DEFAULT_CLOCK_DIGITS + hour_offset);
 
     const float window_ratio = w / h;
-    const float text_ratio = (DIGIT_WIDTH * 8) / DIGIT_HEIGHT;
+    const float text_ratio = (float)text_width / (float)DIGIT_HEIGHT;
     
-    if(text_ratio > window_ratio) *fit_scale = (float)w / (DIGIT_WIDTH * 8);
-    else *fit_scale = (float)h / DIGIT_HEIGHT;
+    if(text_ratio > window_ratio) *fit_scale = (float)w / (float)text_width;
+    else *fit_scale = (float)h / (float)DIGIT_HEIGHT;
 
     return *fit_scale * user_scale;
 }
 
-void get_initial_draw_position(int *x, int *y, const int order, SDL_Window *window, float *fit_scale, float user_scale) {
-    float scaler = calculate_scaler(window, fit_scale, user_scale);
-    float time_table_width = DIGIT_WIDTH * 8 * scaler;
+void get_initial_draw_position(int *x, int *y, const int order, SDL_Window *window, float *fit_scale, float user_scale, const int hour_offset) {
+    float scaler = calculate_scaler(window, fit_scale, user_scale, hour_offset);
+    float time_table_width = DIGIT_WIDTH * (DEFAULT_CLOCK_DIGITS + hour_offset) * scaler;
     float time_table_height = DIGIT_HEIGHT * scaler;
     int w, h;
     SDL_GetWindowSize(window, &w, &h);
@@ -94,9 +95,9 @@ void get_initial_draw_position(int *x, int *y, const int order, SDL_Window *wind
 }
 
 void render_digit_at(SDL_Renderer *renderer, const int digit, const int order, const int frame,
-                    float *fit_scale, float user_scale, SDL_Texture *texture, SDL_Window *window) {
+                    float *fit_scale, float user_scale, SDL_Texture *texture, SDL_Window *window, const int hour_offset) {
     int pen_x, pen_y;
-    get_initial_draw_position(&pen_x, &pen_y, order, window, fit_scale, user_scale);
+    get_initial_draw_position(&pen_x, &pen_y, order, window, fit_scale, user_scale, hour_offset);
     SDL_Rect src_rect = { 
                             digit * DIGIT_WIDTH,
                             DIGIT_HEIGHT * frame,
@@ -115,20 +116,29 @@ void render_digit_at(SDL_Renderer *renderer, const int digit, const int order, c
 
 void render_clock(SDL_Renderer *renderer, Clock *clock, const int frame, 
                 float *fit_scale, float user_scale, SDL_Texture *texture, SDL_Window *window) {
-    //TODO: if clock->hour is more than 3 digits, it will overflow
+    int hour_digit_count = get_number_of_digit(clock->hour);
+    int index = 0;
+    int offset = hour_digit_count - DEFAULT_HOUR_HAND_DIGITS;
+    if(offset < 0) offset = 0;
 
-    render_digit_at(renderer, clock->hour / 10, 0, (frame + 1) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window);
-    render_digit_at(renderer, clock->hour % 10, 1, (frame + 2) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window);
+    if (hour_digit_count > 2) {
+        for (int i = 0; i < hour_digit_count; i++) {
+            render_digit_at(renderer, get_digit(clock->hour, i) , index++, (frame + i) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window, offset);
+        }
+    } else {
+        render_digit_at(renderer, clock->hour / 10, index++, (frame + 1) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window, offset);
+        render_digit_at(renderer, clock->hour % 10, index++, (frame + 2) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window, offset);
+    }
 
-    render_digit_at(renderer, 10, 2, frame, fit_scale, user_scale, texture, window);
+    render_digit_at(renderer, 10, index++, frame, fit_scale, user_scale, texture, window, offset);
 
-    render_digit_at(renderer, clock->minute / 10, 3, (frame + 3) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window);
-    render_digit_at(renderer, clock->minute % 10, 4, (frame + 4) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window);
+    render_digit_at(renderer, clock->minute / 10, index++, (frame + 3) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window, offset);
+    render_digit_at(renderer, clock->minute % 10, index++, (frame + 4) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window, offset);
 
-    render_digit_at(renderer, 10, 5, frame, fit_scale, user_scale, texture, window);
+    render_digit_at(renderer, 10, index++, frame, fit_scale, user_scale, texture, window, offset);
 
-    render_digit_at(renderer, clock->second / 10, 6, (frame + 2) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window);
-    render_digit_at(renderer, clock->second % 10, 7, (frame + 1) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window);
+    render_digit_at(renderer, clock->second / 10, index++, (frame + 2) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window, offset);
+    render_digit_at(renderer, clock->second % 10, index++, (frame + 1) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window, offset);
 }
 
 int parse_clock_from_long(Clock *clock, const long time) {
