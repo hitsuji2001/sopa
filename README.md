@@ -96,11 +96,12 @@ It's a clock :)
 
 #### Flags
 
-| Flags        | Usage                                        |
-| ------------ | -------------------------------------------- |
-| -h or --help | Display help messages                        |
-| -p           | Start the clock in pause state               |
-| -r           | Start the clock by counting in reverse order |
+| Flags        | Usage                                         |
+| ------------ | --------------------------------------------- |
+| -h or --help | Display help messages                         |
+| --clock      | Start the clock from the current desktop time |
+| -p           | Start the clock in pause state                |
+| -r           | Start the clock by counting in reverse order  |
 
 The `-p` flag and `-r` flag can be combinded with each other to start the clock 
 in pause state and counting backward.
@@ -128,6 +129,7 @@ $ ./sopa -rp 69:420:96
 $ ./sopa -p 3h4m5s
 $ ./sopa -r 2d
 $ ./sopa -p 69420s
+$ ./sopa --clock
 ```
 
 ---
@@ -136,7 +138,7 @@ $ ./sopa -p 69420s
 
 | Key                              | Usage                                 |
 | -------------------------------- | ------------------------------------- |
-| <kbd>SPACE</kbd>                 | Pause or unpause the clock            |
+| <kbd>SPACE</kbd> or <kbd>p</kbd> | Pause or unpause the clock            |
 | <kbd>r</kbd>                     | Reset the clock to the original state |
 | <kbd>q</kbd>                     | Quit                                  |
 | <kbd>-</kbd>                     | Zoom out                              |
