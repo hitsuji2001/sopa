@@ -18,9 +18,8 @@ void app_run(int argc, char **argv) {
 
     scc(SDL_Init(SDL_INIT_VIDEO));
 
-    SDL_Window *window = scp(SDL_CreateWindow("sopa", 0, 0, WINDOW_WIDTH, WINDOW_HEIGTH, SDL_WINDOW_RESIZABLE));
+    SDL_Window *window = scp(SDL_CreateWindow("sopa", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGTH, SDL_WINDOW_RESIZABLE));
     SDL_Renderer *renderer = scp(SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC));
-
     SDL_Surface *surface = scp(SDL_CreateRGBSurfaceFrom(png_image,
                                                         (int)png_width, 
                                                         (int)png_height, 
@@ -48,6 +47,9 @@ void app_run(int argc, char **argv) {
                 case SDL_KEYDOWN: {
                   switch (event.key.keysym.sym) {
                       case SDLK_SPACE:
+                          clock.pause = !clock.pause;
+                          break;
+                      case SDLK_p:
                           clock.pause = !clock.pause;
                           break;
                       case SDLK_r:
@@ -80,22 +82,23 @@ void app_run(int argc, char **argv) {
                }
             }
         }
-
+        
         //Render start
         scc(SDL_SetRenderDrawColor(renderer, 69, 69, 69, 255));
         scc(SDL_RenderClear(renderer));
 
         render_clock(renderer, &clock, frame, &fit_scale, user_scale, texture, window);
-        // Update start
-        if (clock.pause) scc(SDL_SetTextureColorMod(texture, 220, 120, 120));
-        else scc(SDL_SetTextureColorMod(texture, 255, 255, 255));
-        clock_advance(&clock);
-        // Update end
 
         SDL_RenderPresent(renderer);
 
         SDL_Delay((int) floorf(DELTA_TIME * 1000.0f));
         //Render end
+        
+        // Update start
+        if (clock.pause) scc(SDL_SetTextureColorMod(texture, 220, 120, 120));
+        else scc(SDL_SetTextureColorMod(texture, 255, 255, 255));
+        clock_advance(&clock);
+        // Update end
     }
 
     SDL_Quit();

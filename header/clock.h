@@ -2,6 +2,7 @@
 #define __CLOCK_H__
 
 #include "./util.h"
+#include <time.h>
 
 typedef struct {
     int hour;
@@ -11,6 +12,7 @@ typedef struct {
 
     bool reverse;
     bool pause;
+    bool is_clock;
 } Clock;
 
 void clock_increase(Clock *clock);
@@ -32,6 +34,7 @@ int from_clock_format_to_clock(Clock *clock, const char *string);
 int from_human_readable_format_to_clock(Clock *clock, const char *string);
 
 int parse_clock_from_long(Clock *clock, const long time);
+int parse_clock_from_current_desktop_time(Clock *clock);
 int parse_clock_from_string(Clock *clock, const char *string);
 int parse_flags_for_clock(Clock *clock, const char *string);
 int parse_clock_from_cmd(Clock *clock, int argc, char **argv);

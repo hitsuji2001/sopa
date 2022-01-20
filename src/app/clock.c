@@ -69,8 +69,9 @@ void clock_set(const Clock *src_clock, Clock *dst_clock) {
 
 float calculate_scaler(SDL_Window *window, float *fit_scale, float user_scale, const int hour_offset) {
     int w, h;
-    SDL_GetWindowSize(window, &w, &h);
     int text_width = DIGIT_WIDTH * (DEFAULT_CLOCK_DIGITS + hour_offset);
+
+    SDL_GetWindowSize(window, &w, &h);
 
     const float window_ratio = w / h;
     const float text_ratio = (float)text_width / (float)DIGIT_HEIGHT;
@@ -86,6 +87,7 @@ void get_initial_draw_position(int *x, int *y, const int order, SDL_Window *wind
     float time_table_width = DIGIT_WIDTH * (DEFAULT_CLOCK_DIGITS + hour_offset) * scaler;
     float time_table_height = DIGIT_HEIGHT * scaler;
     int w, h;
+
     SDL_GetWindowSize(window, &w, &h);
 
     *x = (int)((DIGIT_WIDTH * scaler) * order + (w - time_table_width) / 2);
@@ -122,9 +124,8 @@ void render_clock(SDL_Renderer *renderer, Clock *clock, const int frame,
     if(offset < 0) offset = 0;
 
     if (hour_digit_count > 2) {
-        for (int i = 0; i < hour_digit_count; i++) {
+        for (int i = 0; i < hour_digit_count; i++)
             render_digit_at(renderer, get_digit(clock->hour, i) , index++, (frame + i) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window, offset);
-        }
     } else {
         render_digit_at(renderer, clock->hour / 10, index++, (frame + 1) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window, offset);
         render_digit_at(renderer, clock->hour % 10, index++, (frame + 2) % NUMBER_OF_FRAMES, fit_scale, user_scale, texture, window, offset);
@@ -147,6 +148,19 @@ int parse_clock_from_long(Clock *clock, const long time) {
     clock->hour = time / (60 * 60);
     clock->minute = (time % (60 * 60)) / 60;
     clock->second = (time % (60 * 60)) % 60;
+
+    return 0;
+}
+
+int parse_clock_from_current_desktop_time(Clock *clock) {
+    time_t now = time(&now);
+    struct tm *time_manager = localtime(&now);
+
+    if(time_manager == NULL) return -1;
+
+    clock->hour = time_manager->tm_hour;
+    clock->minute = time_manager->tm_min;
+    clock->second = time_manager->tm_sec;
 
     return 0;
 }
@@ -258,7 +272,7 @@ int parse_flags_for_clock(Clock *clock, const char *string) {
         if(strcmp(string, "--help") == 0) {
             display_help();
             exit (0);
-        }
+        } else if (strcmp(string, "--clock") == 0) clock->is_clock = true;
     } else if (string_contains_more_than_one(string, '-') == 1) {
         if(strlen(string) == 2 && strcmp(string, "-h") == 0) {
             display_help();
@@ -269,6 +283,7 @@ int parse_flags_for_clock(Clock *clock, const char *string) {
             switch (string[i]) {
                 case 'r':
                     clock->reverse = true;
+                    clock->tick = 59;
                     break;
                 case 'p':
                     clock->pause = true;
@@ -289,17 +304,18 @@ int parse_flags_for_clock(Clock *clock, const char *string) {
 int parse_clock_from_cmd(Clock *clock, int argc, char **argv) {
     clock->reverse = false;
     clock->pause = false;
+    clock->is_clock = false;
 
     //TODO: Think of a better way to parse these things
     if (argc == 1) return parse_clock_from_long(clock, 0); // Provided no flag and no time
     else if (argc == 2) {
         if (string_contains(argv[1], '-')) { // Provided flags but no time
             parse_flags_for_clock(clock, argv[1]);
-            if (clock->reverse) {
+            if (clock->is_clock) return parse_clock_from_current_desktop_time(clock);
+            else if (clock->reverse) {
                 fprintf(stderr, "You shouldn't count backward from \'00:00:00\'\n");
                 exit(1);
-            }
-            return parse_clock_from_long(clock, 0);
+            } else return parse_clock_from_long(clock, 0);
         } else { // Provided time but no flag
             if (parse_clock_from_string(clock, argv[1]) < 0) return parse_clock_from_long(clock, from_string_to_long(argv[1]));
         }
