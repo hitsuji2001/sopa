@@ -17,9 +17,9 @@ process_image() {
         echo "Can not parse image to c file"
         exit 1
     else
-        echo "[CMD] File created '$PNG_OUT'"
+        echo "[CMD] Executable file created: '$PNG_OUT'"
         $(./"$PNG_OUT" > "./header/digits.h")
-        echo "[$PNG_OUT] File created '/header/digits.h'"
+        echo "[$PNG_OUT] File created: '/header/digits.h'"
         return 0
     fi
 }
